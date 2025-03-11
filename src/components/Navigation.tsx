@@ -170,7 +170,7 @@ const Navigation: React.FC = () => {
 
   // Mobile header: single row with logo, resizable search bar (centered), and hamburger menu (visible on screens below lg)
   const mobileHeader = useMemo(() => (
-    <div className="lg:hidden p-4 bg-white flex items-center border-1 " >
+    <div className="lg:hidden p-4 bg-white flex items-center  " >
       <Link to="/" className="flex items-center mr-4" onClick={() => setIsMenuOpen(false)}>
         <img src={logo} className="w-12 h-12 rounded-full" alt="Logo" />
         <span className="ml-2 text-lg font-bold text-gray-800 whitespace-nowrap mr-7">TwoThumbsUp</span>

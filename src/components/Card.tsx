@@ -21,12 +21,15 @@ import React, {
     sortBy?: string;
     sortOrder?: string;
     onPhotoCountChange?: React.Dispatch<React.SetStateAction<number>>;
+    onFilterChange?: (filter: string) => void
   }
   
   const Card: React.FC<CardProps> = ({
     filter = '',
     sortBy = 'name',
     sortOrder = 'asc',
+    onFilterChange = () => {}
+
   }) => {
     const { photo, setPhoto } = useContext(ImageContext);
     const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
@@ -102,8 +105,9 @@ import React, {
     const handleFilterChange = useCallback(
       (e: React.ChangeEvent<HTMLInputElement>) => {
         // This filter prop can be used by parent if needed.
+        onFilterChange(e.target.value);
       },
-      []
+      [onFilterChange]
     );
   
     // Open enlarged modal when image is clicked.
@@ -114,15 +118,15 @@ import React, {
     return (
       <div className="p-4 pt-8">
         {/* Optional Filter Input if needed */}
-        <div className="mb-4">
+        {/* <div className="mb-4">
           <input
             type="text"
             placeholder="Filter by name"
-            defaultValue={filter}
+            value={filter}
             onChange={handleFilterChange}
             className="border p-2 rounded w-full bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
           />
-        </div>
+        </div> */}
   
         {pageLoading || loading ? (
           <div className="flex justify-center items-center h-screen">
