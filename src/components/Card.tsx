@@ -28,7 +28,7 @@ import React, {
     filter = '',
     sortBy = 'name',
     sortOrder = 'asc',
-    onFilterChange = () => {}
+    // onFilterChange = () => {}
 
   }) => {
     const { photo, setPhoto } = useContext(ImageContext);
@@ -102,14 +102,7 @@ import React, {
       setSelectedImageId(null);
     }, []);
   
-    const handleFilterChange = useCallback(
-      (e: React.ChangeEvent<HTMLInputElement>) => {
-        // This filter prop can be used by parent if needed.
-        onFilterChange(e.target.value);
-      },
-      [onFilterChange]
-    );
-  
+    
     // Open enlarged modal when image is clicked.
     const handleImageClick = useCallback((src: string) => {
       setEnlargedImageSrc(src);

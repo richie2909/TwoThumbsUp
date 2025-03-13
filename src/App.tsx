@@ -1,7 +1,6 @@
 
 import { ReactRouter } from "./routes/ReactRouter"; 
 // import NotFound from "./pages/NotFound";
-import Contacts from "./pages/Upload";
 import { AuthProvider } from './Context/AuthContext'; 
 import { ImageProvider } from './Context/context.tsx'
 

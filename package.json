@@ -4,9 +4,9 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "nodemon app.js",
+    "start": "nodemon backend/app.js",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
+    "deploy": "gh-pages -d dist --src dist",
     "generate-keys": "node auth/generateKeys.js",
     "dev": "vite",
     "build": "tsc -b && vite build",

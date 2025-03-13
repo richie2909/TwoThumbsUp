@@ -1,4 +1,4 @@
-import React from 'react';
+
 import { useSearchParams } from 'react-router-dom';
 import Navigation from '../components/Navigation';
 import Card from '../components/Card';
