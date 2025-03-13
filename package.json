@@ -6,7 +6,7 @@
   "scripts": {
     "start": "nodemon backend/app.js",
     "predeploy": "npm run build",
-    "deploy": "gh-pages -d dist --src dist",
+    "deploy": "gh-pages -d dist",
     "generate-keys": "node auth/generateKeys.js",
     "dev": "vite",
     "build": "tsc -b && vite build",
