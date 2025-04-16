@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { FaCompress, FaDownload, FaTrash, FaFilter, FaSearch, FaTags } from 'react-icons/fa';
+import { FaCompress, FaDownload, FaTrash, FaSearch, FaTags } from 'react-icons/fa';
 
 const AdminTools: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'optimize' | 'batch'>('optimize');
