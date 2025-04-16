@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Buffer } from 'buffer';
 import { motion } from 'framer-motion';
-import { FaHeart, FaArrowUp, FaFire } from 'react-icons/fa';
+import { FaHeart,  FaFire } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { ImageType } from '../Context/context';
 import LikeButton from './LikeButton';
