@@ -10,4 +10,8 @@ router.post('/', authenticate, authorizeAdmin, imageController.createImage);
 router.patch('/:id', authenticate, authorizeAdmin, imageController.updateImage);
 router.delete('/:id', authenticate, authorizeAdmin, imageController.deleteImage);
 
+// Like functionality routes
+router.post('/:id/like', imageController.likeImage);
+router.get('/:id/like-status', imageController.checkLikeStatus);
+
 export default router;

@@ -12,10 +12,14 @@ import React, {
   import { FaCircleNotch } from 'react-icons/fa';
   import { useAuth } from '../Context/AuthContext';
   import { useNavigate } from 'react-router-dom';
+  import { IoMdClose } from 'react-icons/io';
   
   interface ApiResponse {
     img: ImageType[];
   }
+  
+  // Predefined categories for tags
+  const SUGGESTED_TAGS = ['Inspirational', 'Motivational', 'Wisdom', 'Love', 'Success', 'Happiness', 'Life'];
   
   const Upload: React.FC = () => {
     const { setPhoto } = useContext(ImageContext);
@@ -26,6 +30,10 @@ import React, {
     const [success, setSuccess] = useState<string | null>(null);
     const { isAuthenticated, user } = useAuth();
     const navigate = useNavigate();
+    
+    // Tags functionality
+    const [tags, setTags] = useState<string[]>([]);
+    const [tagInput, setTagInput] = useState<string>('');
   
     const fetchData = useCallback(async () => {
       try {
@@ -47,6 +55,31 @@ import React, {
       setImageFile(e.target.files?.[0] || null);
     }, []);
   
+    // Tag handling functions
+    const addTag = useCallback(() => {
+      if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+        setTags(prev => [...prev, tagInput.trim()]);
+        setTagInput('');
+      }
+    }, [tagInput, tags]);
+  
+    const handleTagInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.preventDefault();
+        addTag();
+      }
+    }, [addTag]);
+  
+    const removeTag = useCallback((tagToRemove: string) => {
+      setTags(prev => prev.filter(tag => tag !== tagToRemove));
+    }, []);
+  
+    const selectSuggestedTag = useCallback((tag: string) => {
+      if (!tags.includes(tag)) {
+        setTags(prev => [...prev, tag]);
+      }
+    }, [tags]);
+  
     const handleSubmit = useCallback(async (e: FormEvent) => {
       e.preventDefault();
       if (!imageFile) return setError('No image file selected.');
@@ -55,6 +88,11 @@ import React, {
       const formData = new FormData();
       formData.append('name', name);
       formData.append('Image', imageFile);
+      
+      // Add tags to formData
+      if (tags.length > 0) {
+        formData.append('tags', JSON.stringify(tags));
+      }
 
       try {
         const response = await fetch('/img', { method: 'POST', body: formData });
@@ -64,12 +102,13 @@ import React, {
         await fetchData();
         setName('');
         setImageFile(null);
+        setTags([]);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'Upload failed');
       } finally {
         setLoading(false);
       }
-    }, [imageFile, name, fetchData]);
+    }, [imageFile, name, tags, fetchData]);
   
     const formContent = useMemo(
       () => (
@@ -124,6 +163,63 @@ import React, {
                 />
               </label>
             </div>
+            
+            {/* Tags Section */}
+            <div className="space-y-2">
+              <label className="block text-sm font-medium text-gray-700">
+                Tags (Categories)
+              </label>
+              <div className="flex flex-wrap gap-2 mb-2">
+                {tags.map(tag => (
+                  <div key={tag} className="flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">
+                    {tag}
+                    <button 
+                      type="button" 
+                      onClick={() => removeTag(tag)}
+                      className="ml-2 text-indigo-500 hover:text-indigo-700"
+                    >
+                      <IoMdClose size={16} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={tagInput}
+                  onChange={(e) => setTagInput(e.target.value)}
+                  onKeyDown={handleTagInputKeyDown}
+                  className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                  placeholder="Add a tag and press Enter"
+                />
+                <button
+                  type="button"
+                  onClick={addTag}
+                  className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+                >
+                  Add
+                </button>
+              </div>
+              <div className="mt-2">
+                <p className="text-sm text-gray-500 mb-2">Suggested tags:</p>
+                <div className="flex flex-wrap gap-2">
+                  {SUGGESTED_TAGS.map(tag => (
+                    <button
+                      key={tag}
+                      type="button"
+                      onClick={() => selectSuggestedTag(tag)}
+                      className={`px-3 py-1 rounded-full text-xs font-medium ${
+                        tags.includes(tag)
+                          ? 'bg-indigo-500 text-white'
+                          : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                      }`}
+                    >
+                      {tag}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
   
             <button
               type="submit"
@@ -145,7 +241,7 @@ import React, {
           </form>
         </div>
       ),
-      [error, success, name, loading, handleSubmit, handleFileChange, imageFile]
+      [error, success, name, loading, handleSubmit, handleFileChange, imageFile, tags, tagInput, addTag, removeTag, handleTagInputKeyDown, selectSuggestedTag]
     );
   
     return (

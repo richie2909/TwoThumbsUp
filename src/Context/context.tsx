@@ -11,6 +11,8 @@ export type ImageType = { // Export ImageType for use in other components
     Name: string;
     ImageData: SerializedBuffer;
     ContentType: string;
+    createdAt?: string;
+    tags?: string[]; // Array of tags for categorizing quotes
 };
 
 interface ImageContextType {

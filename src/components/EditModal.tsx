@@ -10,6 +10,10 @@ import { Dispatch, SetStateAction } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { FaCircleNotch } from 'react-icons/fa';
 import { useAuth } from '../Context/AuthContext';
+import { IoMdClose } from 'react-icons/io';
+
+// Predefined categories for tags
+const SUGGESTED_TAGS = ['Inspirational', 'Motivational', 'Wisdom', 'Love', 'Success', 'Happiness', 'Life'];
 
 interface EditModalProps {
   imageId: string;
@@ -25,13 +29,18 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
   const { photo } = useContext(ImageContext);
   const [localLoading, setLocalLoading] = useState(false);
   const { isAuthenticated, user } = useAuth();
+  
+  // Tags state
+  const [tags, setTags] = useState<string[]>([]);
+  const [tagInput, setTagInput] = useState<string>('');
 
-  // Initialize name from the current photo data.
+  // Initialize name and tags from the current photo data.
   useEffect(() => {
     if (photo) {
       const selectedImage = photo.find((item) => item._id === imageId);
       if (selectedImage) {
         setName(selectedImage.Name);
+        setTags(selectedImage.tags || []);
       }
     }
   }, [imageId, photo]);
@@ -44,6 +53,31 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
       setImageFile(null);
     }
   }, []);
+
+  // Tag handling functions
+  const addTag = useCallback(() => {
+    if (tagInput.trim() && !tags.includes(tagInput.trim())) {
+      setTags(prev => [...prev, tagInput.trim()]);
+      setTagInput('');
+    }
+  }, [tagInput, tags]);
+
+  const handleTagInputKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addTag();
+    }
+  }, [addTag]);
+
+  const removeTag = useCallback((tagToRemove: string) => {
+    setTags(prev => prev.filter(tag => tag !== tagToRemove));
+  }, []);
+
+  const selectSuggestedTag = useCallback((tag: string) => {
+    if (!tags.includes(tag)) {
+      setTags(prev => [...prev, tag]);
+    }
+  }, [tags]);
 
   // Callback to re-fetch image data after updating.
   const refetchData = useCallback(async () => {
@@ -75,6 +109,11 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
     formData.append('name', name);
     if (imageFile) {
       formData.append('image', imageFile);
+    }
+    
+    // Add tags to form data
+    if (tags.length > 0) {
+      formData.append('tags', JSON.stringify(tags));
     }
 
     try {
@@ -109,7 +148,7 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
     } finally {
       setLocalLoading(false);
     }
-  }, [name, imageFile, imageId, refetchData, onClose]);
+  }, [name, imageFile, tags, imageId, refetchData, onClose]);
 
   // Memoized modal output to avoid unnecessary re-renders.
   const memoizedModal = useMemo(() => (
@@ -126,7 +165,7 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: 20 }}
         transition={{ duration: 0.3 }}
-        className="relative p-8 bg-white rounded-xl shadow-2xl w-full max-w-md"
+        className="relative p-8 bg-white rounded-xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto"
       >
         <h3 className="text-2xl font-bold mb-6 text-gray-800 text-center">Edit Image</h3>
         <form onSubmit={handleSubmit} className="space-y-5">
@@ -179,6 +218,62 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
               onChange={handleFileChange}
             />
           </div>
+          
+          {/* Tags Section */}
+          <div>
+            <label className="block mb-2 text-gray-700 font-medium">Tags (Categories):</label>
+            <div className="flex flex-wrap gap-2 mb-2">
+              {tags.map(tag => (
+                <div key={tag} className="flex items-center bg-indigo-100 text-indigo-800 px-3 py-1 rounded-full text-sm">
+                  {tag}
+                  <button 
+                    type="button" 
+                    onClick={() => removeTag(tag)}
+                    className="ml-2 text-indigo-500 hover:text-indigo-700"
+                  >
+                    <IoMdClose size={16} />
+                  </button>
+                </div>
+              ))}
+            </div>
+            <div className="flex gap-2">
+              <input
+                type="text"
+                value={tagInput}
+                onChange={(e) => setTagInput(e.target.value)}
+                onKeyDown={handleTagInputKeyDown}
+                className="flex-grow px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500"
+                placeholder="Add a tag and press Enter"
+              />
+              <button
+                type="button"
+                onClick={addTag}
+                className="px-4 py-2 bg-indigo-500 text-white rounded-lg hover:bg-indigo-600 transition-colors"
+              >
+                Add
+              </button>
+            </div>
+            <div className="mt-2">
+              <p className="text-sm text-gray-500 mb-2">Suggested tags:</p>
+              <div className="flex flex-wrap gap-2">
+                {SUGGESTED_TAGS.map(tag => (
+                  <button
+                    key={tag}
+                    type="button"
+                    onClick={() => selectSuggestedTag(tag)}
+                    className={`px-3 py-1 rounded-full text-xs font-medium ${
+                      tags.includes(tag)
+                        ? 'bg-indigo-500 text-white'
+                        : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                    }`}
+                  >
+                    {tag}
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+          
           {errorMessage && (
             <p className="text-red-500 text-sm text-center p-3 bg-red-50 rounded-lg">
               {errorMessage}
@@ -215,7 +310,7 @@ const EditModal: React.FC<EditModalProps> = ({ imageId, onClose, setPhoto }) => 
         </form>
       </motion.div>
     </motion.div>
-  ), [handleSubmit, localLoading, name, errorMessage, successMessage, onClose, handleFileChange]);
+  ), [handleSubmit, localLoading, name, errorMessage, successMessage, onClose, handleFileChange, tags, tagInput, addTag, removeTag, handleTagInputKeyDown, selectSuggestedTag]);
 
   if (!isAuthenticated || user?.role !== 'admin') {
     return (

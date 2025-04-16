@@ -3,6 +3,9 @@ import logo from "../assets/logo.jpg";
 import { Link } from 'react-router-dom';
 import { FaFacebook, FaTwitter, FaInstagram } from 'react-icons/fa';
 
+// Common categories matching the uploaded quotes tags
+const CATEGORIES = ['Inspirational', 'Motivational', 'Wisdom', 'Love', 'Success', 'Happiness', 'Life'];
+
 const Footer: React.FC = () => {
   const [currentYear, setCurrentYear] = React.useState<number>(0);
 
@@ -25,7 +28,7 @@ const Footer: React.FC = () => {
               <span className="text-xl font-bold">TwoThumbsUp</span>
             </Link>
             <p className="text-gray-400 text-sm">
-              Capturing moments, creating memories. Professional photography services for all occasions.
+              Sharing wisdom and inspiration through our curated collection of quote images to uplift and motivate.
             </p>
           </div>
 
@@ -52,31 +55,31 @@ const Footer: React.FC = () => {
                 </li>
                 <li>
                   <Link
-                    to="/admin"
+                    to="/search"
                     className="text-gray-400 hover:text-blue-400 transition-colors"
                   >
-                    Admin
+                    Search Quotes
                   </Link>
                 </li>
               </ul>
             </nav>
           </div>
 
-          {/* Legal */}
+          {/* Categories */}
           <div>
-            <h3 className="text-lg font-semibold mb-4">Legal</h3>
+            <h3 className="text-lg font-semibold mb-4">Categories</h3>
             <nav>
               <ul className="space-y-2">
-                <li>
-                  <Link to="/privacy" className="text-gray-400 hover:text-blue-400 transition-colors">
-                    Privacy Policy
-                  </Link>
-                </li>
-                <li>
-                  <Link to="/terms" className="text-gray-400 hover:text-blue-400 transition-colors">
-                    Terms of Service
-                  </Link>
-                </li>
+                {CATEGORIES.map(category => (
+                  <li key={category}>
+                    <Link 
+                      to={`/search?tag=${category.toLowerCase()}`} 
+                      className="text-gray-400 hover:text-blue-400 transition-colors"
+                    >
+                      {category}
+                    </Link>
+                  </li>
+                ))}
               </ul>
             </nav>
           </div>
@@ -86,7 +89,7 @@ const Footer: React.FC = () => {
             <h3 className="text-lg font-semibold mb-4">Connect With Us</h3>
             <div className="flex space-x-4">
               <a
-                href=""
+                href="#"
                 className="text-gray-400 hover:text-blue-400 transition-colors"
                 aria-label="Facebook"
               >

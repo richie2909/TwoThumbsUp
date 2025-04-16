@@ -13,7 +13,8 @@ export const useFetchImages = (setPhoto: (photos: ImageType[]) => void) => {
     async (
       filter: string = '',
       sortBy: string = 'name',
-      sortOrder: string = 'asc'
+      sortOrder: string = 'asc',
+      limit?: number
     ) => {
       setLoading(true);
       setPageLoading(true);
@@ -28,6 +29,9 @@ export const useFetchImages = (setPhoto: (photos: ImageType[]) => void) => {
         }
         if (sortOrder) {
           params.append('sortOrder', sortOrder);
+        }
+        if (limit) {
+          params.append('limit', limit.toString());
         }
         if (params.toString()) {
           url += `?${params.toString()}`;

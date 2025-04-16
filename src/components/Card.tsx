@@ -21,15 +21,18 @@ import React, {
     sortBy?: string;
     sortOrder?: string;
     onPhotoCountChange?: React.Dispatch<React.SetStateAction<number>>;
-    onFilterChange?: (filter: string) => void
+    onFilterChange?: (filter: string) => void;
+    selectedTag?: string;
+    limit?: number;
   }
   
   const Card: React.FC<CardProps> = ({
     filter = '',
     sortBy = 'name',
     sortOrder = 'asc',
+    selectedTag = '',
+    limit,
     // onFilterChange = () => {}
-
   }) => {
     const { photo, setPhoto } = useContext(ImageContext);
     const [selectedImageId, setSelectedImageId] = useState<string | null>(null);
@@ -41,17 +44,32 @@ import React, {
     // Fetch images using our custom hook.
     const { fetchData, loading, pageLoading } = useFetchImages(setPhoto);
     useEffect(() => {
-      fetchData(filter, sortBy, sortOrder);
-    }, [fetchData, filter, sortBy, sortOrder]);
+      fetchData(filter, sortBy, sortOrder, limit);
+    }, [fetchData, filter, sortBy, sortOrder, limit]);
   
     // Client-side filtering (if needed).
     const filteredPhotos = useMemo(() => {
       if (!photo) return [];
-      if (!filter.trim()) return photo;
-      return photo.filter((item) =>
-        item.Name.toLowerCase().includes(filter.trim().toLowerCase())
-      );
-    }, [photo, filter]);
+      
+      // First filter by search term if provided
+      let filtered = !filter.trim() 
+        ? photo 
+        : photo.filter((item) => item.Name.toLowerCase().includes(filter.trim().toLowerCase()));
+      
+      // Then filter by tag if selected
+      if (selectedTag) {
+        filtered = filtered.filter(item => 
+          item.tags && item.tags.some(tag => tag.toLowerCase() === selectedTag.toLowerCase())
+        );
+      }
+      
+      // Apply limit if provided
+      if (limit && filtered.length > limit) {
+        filtered = filtered.slice(0, limit);
+      }
+      
+      return filtered;
+    }, [photo, filter, selectedTag, limit]);
   
     // Convert Buffer image data to base64.
     const getImageSrc = useCallback((item: ImageType): string => {

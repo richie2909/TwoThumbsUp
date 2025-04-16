@@ -21,6 +21,19 @@ const ImageSchema = new mongoose.Schema({
         type: String,
         required: true,
     },
+    tags: {
+        type: [String],
+        default: [],
+        index: true
+    },
+    likes: {
+        type: Number,
+        default: 0
+    },
+    likedBy: {
+        type: [String], // Array of user IDs who liked the image
+        default: []
+    }
 }, { timestamps: true });
 
 const Image = mongoose.models.Image || mongoose.model('Image', ImageSchema);

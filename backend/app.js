@@ -7,9 +7,25 @@ import cookieParser from 'cookie-parser';
 import { initializeAdmins } from './model/schema.js';
 import imageRoutes from './routes/route.js';
 import errorHandler from './middleware/errorHandler.js';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Load environment variables
-dotenv.config();
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+// Load environment variables with explicit path
+dotenv.config({ path: path.join(__dirname, '.env') });
+
+// Check if critical env vars are loaded
+if (!process.env.JWT_SECRET) {
+  console.error('ERROR: JWT_SECRET environment variable is not set!');
+  process.exit(1);
+}
+
+if (!process.env.MONGO_URI) {
+  console.error('ERROR: MONGO_URI environment variable is not set!');
+  process.exit(1);
+}
 
 const app = express();
 // Use different port for different environments
