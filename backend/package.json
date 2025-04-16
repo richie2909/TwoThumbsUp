@@ -5,11 +5,11 @@
   "version": "0.1.0",
   "type": "module",
   "scripts": {
-    "start": "nodemon backend/app.js",
+    "start": "node app.js",
+    "dev": "nodemon app.js",
     "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "generate-keys": "node auth/generateKeys.js",
-    "dev": "vite",
     "build": "tsc -b && vite build",
     "lint": "eslint .",
     "preview": "vite preview"
