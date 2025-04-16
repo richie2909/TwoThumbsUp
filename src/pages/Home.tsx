@@ -3,6 +3,7 @@ import Navigation from '../components/Navigation';
 import Card from '../components/Card';
 import CookieConsent from '../components/Cookie';
 import Footer from '../components/Footer';
+import PopularImages from '../components/PopularImages';
 import { FaCircleNotch } from 'react-icons/fa';
 
 // Interface for the Image/Quote data
@@ -16,7 +17,7 @@ interface QuoteImage {
 
 const Home = () => {
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState('');
+  const [filter] = useState('');
   const [sortBy, setSortBy] = useState('name');
   const [sortOrder, setSortOrder] = useState('asc');
   const [featuredQuote, setFeaturedQuote] = useState<QuoteImage | null>(null);
@@ -120,73 +121,100 @@ const Home = () => {
           </div>
         )}
 
-        {/* Sort Options */}
-        <div className="mb-6 flex flex-wrap gap-4 items-center bg-white p-4 rounded-xl shadow-sm">
-          <div className="font-medium text-gray-700">Sort by:</div>
-          <div className="flex flex-wrap gap-2">
-            <button
-              onClick={() => {
-                setSortBy('name');
-                setSortOrder('asc');
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                sortBy === 'name' && sortOrder === 'asc'
-                  ? 'bg-indigo-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Name (A-Z)
-            </button>
-            <button
-              onClick={() => {
-                setSortBy('name');
-                setSortOrder('desc');
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                sortBy === 'name' && sortOrder === 'desc'
-                  ? 'bg-indigo-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Name (Z-A)
-            </button>
-            <button
-              onClick={() => {
-                setSortBy('createdAt');
-                setSortOrder('desc');
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                sortBy === 'createdAt' && sortOrder === 'desc'
-                  ? 'bg-indigo-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Newest
-            </button>
-            <button
-              onClick={() => {
-                setSortBy('createdAt');
-                setSortOrder('asc');
-              }}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
-                sortBy === 'createdAt' && sortOrder === 'asc'
-                  ? 'bg-indigo-600 text-white' 
-                  : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-              }`}
-            >
-              Oldest
-            </button>
-          </div>
-        </div>
+        {/* Main Content Area with Sidebar */}
+        <div className="flex flex-col lg:flex-row gap-8">
+          {/* Main Content */}
+          <div className="lg:w-3/4">
+            {/* Sort Options */}
+            <div className="mb-6 flex flex-wrap gap-4 items-center bg-white p-4 rounded-xl shadow-sm">
+              <div className="font-medium text-gray-700">Sort by:</div>
+              <div className="flex flex-wrap gap-2">
+                <button
+                  onClick={() => {
+                    setSortBy('name');
+                    setSortOrder('asc');
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    sortBy === 'name' && sortOrder === 'asc'
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Name (A-Z)
+                </button>
+                <button
+                  onClick={() => {
+                    setSortBy('name');
+                    setSortOrder('desc');
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    sortBy === 'name' && sortOrder === 'desc'
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Name (Z-A)
+                </button>
+                <button
+                  onClick={() => {
+                    setSortBy('createdAt');
+                    setSortOrder('desc');
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    sortBy === 'createdAt' && sortOrder === 'desc'
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Newest
+                </button>
+                <button
+                  onClick={() => {
+                    setSortBy('createdAt');
+                    setSortOrder('asc');
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    sortBy === 'createdAt' && sortOrder === 'asc'
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Oldest
+                </button>
+                <button
+                  onClick={() => {
+                    setSortBy('likes');
+                    setSortOrder('desc');
+                  }}
+                  className={`px-4 py-2 rounded-full text-sm font-medium ${
+                    sortBy === 'likes' && sortOrder === 'desc'
+                      ? 'bg-indigo-600 text-white' 
+                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                  }`}
+                >
+                  Most Liked
+                </button>
+              </div>
+            </div>
 
-        {/* Quotes Section */}
-        <div className="mb-8 p-6 bg-white rounded-3xl shadow-md">
-          <h3 className="text-xl md:text-2xl font-semibold text-gray-800 border-b border-gray-200 pb-4 mb-6">
-            {filter ? `Search Results for "${filter}"` : 'All Quotes'}
-          </h3>
+            {/* Quotes Section */}
+            <div className="mb-8 p-6 bg-white rounded-3xl shadow-md">
+              <h3 className="text-xl md:text-2xl font-semibold text-gray-800 border-b border-gray-200 pb-4 mb-6">
+                {filter ? `Search Results for "${filter}"` : 'All Quotes'}
+              </h3>
+              
+              {/* Quote Cards - Using Original Card Component */}
+              <Card filter={filter} sortBy={sortBy} sortOrder={sortOrder} />
+            </div>
+          </div>
           
-          {/* Quote Cards - Using Original Card Component */}
-          <Card filter={filter} sortBy={sortBy} sortOrder={sortOrder} />
+          {/* Sidebar */}
+          <div className="lg:w-1/4 space-y-6">
+            {/* Popular Images */}
+            <PopularImages limit={5} />
+            
+            {/* You might add other sidebar widgets here */}
+          </div>
         </div>
       </div>
       <Footer />

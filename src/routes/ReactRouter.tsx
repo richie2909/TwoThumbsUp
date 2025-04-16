@@ -1,4 +1,4 @@
-import { BrowserRouter as Browser, Route, Routes } from 'react-router-dom';
+import { HashRouter as Router, Route, Routes } from 'react-router-dom';
 import Home from '../pages/Home';
 import Upload from '../pages/Upload.jsx'; // Corrected file extension
 import NotFound from '../pages/NotFound';
@@ -12,7 +12,7 @@ import TermsOfService from '../components/Terms.js';
 
 export const ReactRouter = () => {
   return (
-    <Browser>
+    <Router>
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path='/terms' element={<TermsOfService/>}></Route>
@@ -24,6 +24,6 @@ export const ReactRouter = () => {
         <Route path='/search' element={ <Search />}></Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
-    </Browser>
+    </Router>
   );
 };

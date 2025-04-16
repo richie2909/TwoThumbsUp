@@ -1,7 +1,5 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { RiDeleteBinLine } from 'react-icons/ri';
-import { CiEdit } from 'react-icons/ci';
 import { ImageType } from '../Context/context';
 import { HiPencilAlt, HiTrash } from 'react-icons/hi';
 import { Link } from 'react-router-dom';

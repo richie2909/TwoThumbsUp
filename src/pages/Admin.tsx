@@ -3,9 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import Card from '../components/Card';
 import UploadForm from './Upload';
 import TrafficChart from '../pages/TrafficChart';
+import AdminTools from '../components/AdminTools';
 import { useAuth } from '../Context/AuthContext';
 import { motion, AnimatePresence } from 'framer-motion';
-import { FaImage, FaTag, FaHeart, FaUser } from 'react-icons/fa';
+import { FaImage, FaTag, FaHeart, FaUser, FaTools, FaChartLine, FaUpload, FaList } from 'react-icons/fa';
 
 const Admin: React.FC = () => {
   const navigate = useNavigate();
@@ -75,19 +76,30 @@ const Admin: React.FC = () => {
       case 'upload':
         return (
           <div className="bg-white p-6 rounded-xl shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Upload New Image</h3>
             <UploadForm />
           </div>
         );
       case 'manage':
         return (
           <div className="bg-white p-6 rounded-xl shadow-md">
+            <h3 className="text-xl font-semibold mb-4 text-gray-800">Manage Images</h3>
             <Card onPhotoCountChange={setPhotoCount} />
           </div>
         );
       case 'analytics':
         return (
-          <div className="bg-white p-6 rounded-xl shadow-md">
-            <TrafficChart />
+          <div className="space-y-6">
+            <div className="bg-white p-6 rounded-xl shadow-md">
+              <h3 className="text-xl font-semibold mb-4 text-gray-800">Analytics Dashboard</h3>
+              <TrafficChart />
+            </div>
+          </div>
+        );
+      case 'tools':
+        return (
+          <div className="space-y-6">
+            <AdminTools />
           </div>
         );
       default: // dashboard
@@ -195,46 +207,56 @@ const Admin: React.FC = () => {
         </div>
         
         {/* Tabs */}
-        <div className="bg-white rounded-xl shadow-md p-3 mb-6 flex flex-wrap space-x-2">
+        <div className="bg-white rounded-xl shadow-md p-3 mb-6 flex flex-wrap gap-2">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
               activeTab === 'dashboard' 
                 ? 'bg-indigo-500 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Dashboard
+            <FaChartLine className="mr-1.5" /> Dashboard
           </button>
           <button
             onClick={() => setActiveTab('upload')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
               activeTab === 'upload' 
                 ? 'bg-indigo-500 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Upload Image
+            <FaUpload className="mr-1.5" /> Upload
           </button>
           <button
             onClick={() => setActiveTab('manage')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
               activeTab === 'manage' 
                 ? 'bg-indigo-500 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Manage Images
+            <FaList className="mr-1.5" /> Manage Images
           </button>
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
               activeTab === 'analytics' 
                 ? 'bg-indigo-500 text-white' 
                 : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
             }`}
           >
-            Analytics
+            <FaChartLine className="mr-1.5" /> Analytics
+          </button>
+          <button
+            onClick={() => setActiveTab('tools')}
+            className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors flex items-center ${
+              activeTab === 'tools' 
+                ? 'bg-indigo-500 text-white' 
+                : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+            }`}
+          >
+            <FaTools className="mr-1.5" /> Tools
           </button>
         </div>
         

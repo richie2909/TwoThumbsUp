@@ -174,6 +174,19 @@ const Search = () => {
                     >
                       Oldest
                     </button>
+                    <button
+                      onClick={() => {
+                        setSortBy('likes');
+                        setSortOrder('desc');
+                      }}
+                      className={`px-4 py-2 rounded-full text-sm font-medium ${
+                        sortBy === 'likes' && sortOrder === 'desc'
+                          ? 'bg-indigo-600 text-white' 
+                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      }`}
+                    >
+                      Most Liked
+                    </button>
                   </div>
                 </div>
               </div>

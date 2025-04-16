@@ -13,6 +13,8 @@ export type ImageType = { // Export ImageType for use in other components
     ContentType: string;
     createdAt?: string;
     tags?: string[]; // Array of tags for categorizing quotes
+    likes?: number; // Number of likes on the image
+    likedBy?: string[]; // Array of user IDs who liked the image
 };
 
 interface ImageContextType {
