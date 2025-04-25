@@ -39,13 +39,13 @@ const CardItemMobile: React.FC<CardItemMobileProps> = ({
       className="w-full bg-white rounded-xl shadow-md overflow-hidden"
     >
       <div 
-        className="h-48 overflow-hidden cursor-pointer" 
+        className="relative pt-[100%] overflow-hidden cursor-pointer bg-gray-50" 
         onClick={() => onImageClick(imageSrc)}
       >
         <img
           src={imageSrc}
           alt={item.Name}
-          className="w-full h-full object-cover"
+          className="absolute inset-0 w-full h-full object-contain"
         />
       </div>
       <div className="p-4">

@@ -1,17 +1,21 @@
 import express from 'express';
-import { authenticate, authorizeAdmin } from '../middleware/Auth.js';
-import { imageController, log } from '../controllers/image.js';
+import { imageController } from '../controllers/image.js';
+
 
 const router = express.Router();
 
-router.post('/api/login', log )
+// Public routes
 router.get('/', imageController.getImages);
-router.post('/', authenticate, authorizeAdmin, imageController.createImage);
-router.patch('/:id', authenticate, authorizeAdmin, imageController.updateImage);
-router.delete('/:id', authenticate, authorizeAdmin, imageController.deleteImage);
+router.post('/api/login', imageController.log);
 
-// Like functionality routes
-router.post('/:id/like', imageController.likeImage);
 router.get('/:id/like-status', imageController.checkLikeStatus);
+
+// Routes requiring authentication
+router.post('/:id/like', imageController.likeImage);
+
+// Admin-only routes
+router.post('/', imageController.createImage);
+router.patch('/:id',  imageController.updateImage);
+router.delete('/:id', imageController.deleteImage);
 
 export default router;

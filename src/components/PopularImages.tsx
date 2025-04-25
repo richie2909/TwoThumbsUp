@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Buffer } from 'buffer';
 import { motion } from 'framer-motion';
-import { FaHeart,  FaFire } from 'react-icons/fa';
+import { FaHeart, FaFire } from 'react-icons/fa';
 import { Link } from 'react-router-dom';
 import { ImageType } from '../Context/context';
 import LikeButton from './LikeButton';
+import EnlargeImageModal from './EnlargementImageModal';
 
 interface PopularImagesProps {
   limit?: number;
@@ -15,50 +16,76 @@ const PopularImages: React.FC<PopularImagesProps> = ({ limit = 5, className = ''
   const [popularImages, setPopularImages] = useState<ImageType[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string | null>(null);
+  const [enlargedImage, setEnlargedImage] = useState<string | null>(null);
+  const [showModal, setShowModal] = useState<boolean>(false);
 
-  useEffect(() => {
-    const fetchPopularImages = async () => {
-      setLoading(true);
-      try {
-        // Fetch images sorted by likes in descending order
-        const response = await fetch(`/img?sort=likes&order=desc&limit=${limit}`, {
-          credentials: 'include'
-        });
-        
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
-        }
-        
-        const json = await response.json();
-        if (json && json.img) {
-          setPopularImages(json.img);
-        } else {
-          throw new Error('Invalid response format');
-        }
-      } catch (error) {
-        console.error('Error fetching popular images:', error);
-        setError('Failed to load popular images');
-      } finally {
-        setLoading(false);
+  // Function to fetch popular images
+  const fetchPopularImages = useCallback(async () => {
+    try {
+      const response = await fetch(`/img?sort=likes&order=desc&limit=${limit}`, {
+        credentials: 'include'
+      });
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
       }
-    };
-    
-    fetchPopularImages();
+      
+      const json = await response.json();
+      console.log("Popular images response:", json);
+      
+      if (json && Array.isArray(json.img)) {
+        setPopularImages(json.img);
+      } else if (json && Array.isArray(json)) {
+        setPopularImages(json);
+      } else {
+        console.error("Unexpected response format:", json);
+        throw new Error('Invalid response format');
+      }
+    } catch (error) {
+      console.error('Error fetching popular images:', error);
+      setError('Failed to load popular images');
+    } finally {
+      setLoading(false);
+    }
   }, [limit]);
 
-  // Convert Buffer image data to base64
+  // Effect to fetch images when component mounts
+  useEffect(() => {
+    setLoading(true);
+    fetchPopularImages();
+  }, [fetchPopularImages]);
+
+  // Direct URL for image source
   const getImageSrc = (item: ImageType): string => {
-    let base64String = '';
-    if (item.ImageData) {
-      if ((item.ImageData as { data: number[] }).data) {
-        base64String = Buffer.from(
-          (item.ImageData as { data: number[] }).data
-        ).toString('base64');
-      } else {
-        base64String = Buffer.from(item.ImageData as any).toString('base64');
-      }
+    if (!item || !item._id) {
+      console.error("Invalid image item:", item);
+      return ''; // Return empty string or placeholder
     }
-    return `data:${item.ContentType};base64,${base64String}`;
+    return `/img/${item._id}`;
+  };
+
+  // Handle image click to show enlarged view
+  const handleImageClick = (item: ImageType) => {
+    const imgSrc = getImageSrc(item);
+    console.log("Enlarging image:", imgSrc);
+    setEnlargedImage(imgSrc);
+    setShowModal(true);
+  };
+
+  // Handle like action to update the hearts count in real-time
+  const handleHeartUpdate = (imageId: string) => {
+    setPopularImages(prevImages => prevImages.map(image => {
+      if (image._id === imageId) {
+        // Toggle the heart count without refetching the entire list
+        const wasHearted = image.heartedByCurrentUser || false;
+        return {
+          ...image,
+          hearts: wasHearted ? (image.hearts || 0) - 1 : (image.hearts || 0) + 1,
+          heartedByCurrentUser: !wasHearted
+        };
+      }
+      return image;
+    }));
   };
 
   if (loading) {
@@ -74,7 +101,7 @@ const PopularImages: React.FC<PopularImagesProps> = ({ limit = 5, className = ''
   if (error) {
     return (
       <div className={`p-4 bg-white rounded-xl shadow-md ${className}`}>
-        <div className="text-red-500 text-center py-4">{error}</div>
+        <p className="text-red-500">{error}</p>
       </div>
     );
   }
@@ -82,79 +109,70 @@ const PopularImages: React.FC<PopularImagesProps> = ({ limit = 5, className = ''
   if (popularImages.length === 0) {
     return (
       <div className={`p-4 bg-white rounded-xl shadow-md ${className}`}>
-        <div className="text-gray-500 text-center py-4">No popular images found</div>
+        <p className="text-gray-500">No popular images found</p>
       </div>
     );
   }
 
   return (
-    <div className={`p-4 bg-white rounded-xl shadow-md ${className}`}>
-      <div className="flex justify-between items-center mb-4">
-        <h3 className="text-lg font-semibold text-gray-800 flex items-center">
-          <FaFire className="text-orange-500 mr-2" /> 
-          Popular Images
-        </h3>
-        <Link to="/search?sort=likes&order=desc" className="text-indigo-500 text-sm hover:text-indigo-700">
-          View All
-        </Link>
+    <>
+      <div className={`bg-white rounded-xl shadow-md ${className}`}>
+        <div className="p-4 border-b border-gray-100">
+          <div className="flex items-center">
+            <FaFire className="text-orange-500 mr-2" />
+            <h2 className="text-lg font-semibold text-gray-800">Popular Images</h2>
+          </div>
+        </div>
+        <div className="p-4">
+          <div className="grid grid-cols-1 gap-4">
+            {popularImages.map((item) => (
+              <motion.div
+                key={item._id}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.3 }}
+                className="flex items-center space-x-3 p-2 hover:bg-gray-50 rounded-lg transition"
+              >
+                <div 
+                  onClick={() => handleImageClick(item)} 
+                  className="block relative w-16 h-16 rounded overflow-hidden bg-gray-100 cursor-pointer"
+                >
+                  <img
+                    src={getImageSrc(item)}
+                    alt={item.Name}
+                    className="w-full h-full object-contain"
+                    onError={(e) => {
+                      console.error(`Error loading image: ${item._id}`);
+                      (e.target as HTMLImageElement).src = '/placeholder.jpg';
+                    }}
+                  />
+                </div>
+                <div className="flex-1">
+                  <h3 className="font-medium text-gray-800 truncate">{item.Name}</h3>
+                  <div className="flex items-center text-sm text-gray-500">
+                    <FaHeart className="text-red-500 mr-1" />
+                    <span>{item.hearts || 0} hearts</span>
+                  </div>
+                </div>
+                <LikeButton 
+                  imageId={item._id} 
+                  initialLiked={item.heartedByCurrentUser || false}
+                  onLikeUpdate={() => handleHeartUpdate(item._id)} 
+                />
+              </motion.div>
+            ))}
+          </div>
+        </div>
       </div>
       
-      <div className="space-y-4">
-        {popularImages.map((image, index) => (
-          <motion.div 
-            key={image._id}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: index * 0.1 }}
-            className="flex items-center p-2 rounded-lg hover:bg-gray-50 transition-colors"
-          >
-            <div className="w-16 h-16 mr-3 rounded-md overflow-hidden flex-shrink-0">
-              <Link to={`/search?id=${image._id}`}>
-                <img 
-                  src={getImageSrc(image)} 
-                  alt={image.Name} 
-                  className="w-full h-full object-cover"
-                />
-              </Link>
-            </div>
-            
-            <div className="flex-grow min-w-0">
-              <Link to={`/search?id=${image._id}`} className="hover:text-indigo-600">
-                <h4 className="font-medium text-gray-800 truncate">{image.Name}</h4>
-              </Link>
-              
-              <div className="flex items-center mt-1">
-                <div className="flex items-center text-xs text-gray-500">
-                  <FaHeart className="text-red-500 mr-1" />
-                  <span>{image.likes} likes</span>
-                </div>
-                
-                {image.tags && image.tags.length > 0 && (
-                  <div className="ml-3 flex flex-wrap gap-1">
-                    {image.tags.slice(0, 2).map(tag => (
-                      <Link 
-                        key={tag}
-                        to={`/search?tag=${tag.toLowerCase()}`}
-                        className="text-xs bg-indigo-100 text-indigo-800 px-1.5 py-0.5 rounded-full"
-                      >
-                        #{tag}
-                      </Link>
-                    ))}
-                    {image.tags.length > 2 && (
-                      <span className="text-xs text-gray-500">+{image.tags.length - 2}</span>
-                    )}
-                  </div>
-                )}
-              </div>
-            </div>
-            
-            <div className="ml-2">
-              <LikeButton imageId={image._id} size="sm" showCount={false} />
-            </div>
-          </motion.div>
-        ))}
-      </div>
-    </div>
+      {/* Image enlargement modal */}
+      {showModal && enlargedImage && (
+        <EnlargeImageModal
+          imageSrc={enlargedImage}
+          onClose={() => setShowModal(false)}
+        />
+      )}
+    </>
   );
 };
 

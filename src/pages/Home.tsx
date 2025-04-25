@@ -5,6 +5,7 @@ import CookieConsent from '../components/Cookie';
 import Footer from '../components/Footer';
 import PopularImages from '../components/PopularImages';
 import { FaCircleNotch } from 'react-icons/fa';
+import BlogSection from '../components/BlogSection';
 
 // Interface for the Image/Quote data
 interface QuoteImage {
@@ -92,6 +93,9 @@ const Home = () => {
             </div>
           </div>
         </div>
+
+        {/* Blog Section */}
+        <BlogSection />
 
         {/* Featured Quote - Always shows the newest quote */}
         {featuredQuote && (

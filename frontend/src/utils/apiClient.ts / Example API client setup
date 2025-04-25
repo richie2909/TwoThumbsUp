@@ -1,0 +1,43 @@
+import axios from 'axios';
+import { GetTokenSilentlyOptions } from '@auth0/auth0-react'; // Import if needed
+
+const apiClient = axios.create({
+  baseURL: `${import.meta.env.VITE_API_URL}/api/${import.meta.env.VITE_API_VERSION}`,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Function to set the Authorization header dynamically
+export const setAuthHeader = (token: string | null) => {
+  if (token) {
+    apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+  } else {
+    delete apiClient.defaults.headers.common['Authorization'];
+  }
+};
+
+// You'll call this function somewhere after login or before making authenticated requests
+// using getAccessTokenSilently from useAuth0 hook
+// Example usage in a component:
+// const { getAccessTokenSilently } = useAuth0();
+// useEffect(() => {
+//   const getToken = async () => {
+//     try {
+//       const token = await getAccessTokenSilently({
+//         authorizationParams: {
+//           audience: import.meta.env.VITE_AUTH0_AUDIENCE,
+//         }
+//       });
+//       setAuthHeader(token);
+//       // Now you can make API calls
+//     } catch (e) {
+//       console.error("Error getting access token", e);
+//       setAuthHeader(null); // Ensure header is clear on error
+//     }
+//   };
+//   getToken();
+// }, [getAccessTokenSilently]);
+
+
+export default apiClient; 

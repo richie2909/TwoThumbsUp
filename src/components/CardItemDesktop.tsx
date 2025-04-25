@@ -42,13 +42,13 @@ const CardItemDesktop: React.FC<CardItemProps> = ({
     >
       {/* Image Section */}
       <div 
-        className="h-48 overflow-hidden cursor-pointer" 
+        className="relative pt-[100%] overflow-hidden cursor-pointer bg-gray-50" 
         onClick={() => onImageClick && onImageClick(imageSrc)}
       >
         <img
           src={imageSrc}
           alt={item.Name}
-          className="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          className="absolute inset-0 w-full h-full object-contain hover:scale-105 transition-transform duration-300"
         />
       </div>
 

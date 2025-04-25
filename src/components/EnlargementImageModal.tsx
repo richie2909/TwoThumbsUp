@@ -1,6 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
 import { FaTimes } from 'react-icons/fa';
+import { motion } from 'framer-motion';
 
 interface EnlargeImageModalProps {
   imageSrc: string;
@@ -8,54 +8,44 @@ interface EnlargeImageModalProps {
 }
 
 const EnlargeImageModal: React.FC<EnlargeImageModalProps> = ({ imageSrc, onClose }) => {
-  // Debug: log the imageSrc so you can verify it's passed correctly.
-  useEffect(() => {
-    console.log('EnlargeImageModal imageSrc:', imageSrc);
-  }, [imageSrc]);
-
-  const handleOverlayClick = useCallback(
-    (e: React.MouseEvent<HTMLDivElement>) => {
-      if (e.target === e.currentTarget) {
-        onClose();
-      }
-    },
-    [onClose]
-  );
-
-  // If no image source is provided, don't render anything.
-  if (!imageSrc) return null;
+  console.log("Modal opened with image:", imageSrc);
+  
+  // Handle backdrop click to close
+  const handleBackdropClick = (e: React.MouseEvent) => {
+    if (e.target === e.currentTarget) {
+      onClose();
+    }
+  };
 
   return (
-    <AnimatePresence>
-      <motion.div
-        className="fixed inset-0 flex items-center justify-center bg-white/40 backdrop-blur-lg z-50"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={handleOverlayClick}
-      >
-        <motion.div
-          className="relative p-6 bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[80vh] overflow-auto"
-          initial={{ scale: 0.8 }}
-          animate={{ scale: 1 }}
-          exit={{ scale: 0.8 }}
-          transition={{ duration: 0.3 }}
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      exit={{ opacity: 0 }}
+      className="fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4"
+      onClick={handleBackdropClick}
+    >
+      <div className="relative max-w-4xl max-h-[90vh] overflow-hidden rounded-lg">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 z-10 bg-black bg-opacity-50 rounded-full p-2 text-white hover:bg-opacity-70 transition"
+          aria-label="Close modal"
         >
-          {imageSrc ? (
-            <img src={imageSrc} alt="Enlarged" className="w-full h-auto object-contain" />
-          ) : (
-            <div className="text-center text-gray-500">No image available</div>
-          )}
-          <button
-            onClick={onClose}
-            className="absolute top-2 right-2 text-white bg-black bg-opacity-50 p-2 rounded-full hover:bg-opacity-75 transition"
-          >
-            <FaTimes size={20} />
-          </button>
-        </motion.div>
-      </motion.div>
-    </AnimatePresence>
+          <FaTimes />
+        </button>
+        
+        <img
+          src={imageSrc}
+          alt="Enlarged view"
+          className="max-h-[90vh] max-w-full object-contain"
+          onError={(e) => {
+            console.error(`Failed to load enlarged image: ${imageSrc}`);
+            (e.target as HTMLImageElement).src = '/placeholder.jpg';
+          }}
+        />
+      </div>
+    </motion.div>
   );
 };
 
-export default React.memo(EnlargeImageModal);
+export default EnlargeImageModal;

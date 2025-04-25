@@ -9,6 +9,7 @@ import Search from '../pages/Search.js';
 import CookiePolicy from '../components/Cookie.js';
 import PrivacyPolicy from '../components/Policy.js';
 import TermsOfService from '../components/Terms.js';
+import BlogPostDetail from '../components/BlogPostDetail';
 
 export const ReactRouter = () => {
   return (
@@ -22,6 +23,7 @@ export const ReactRouter = () => {
         <Route path="/upload" element={<Upload />} />
         <Route path="/admin" element={<ProtectedRoute><Admin /></ProtectedRoute>} />
         <Route path='/search' element={ <Search />}></Route>
+        <Route path="/blog/:id" element={<BlogPostDetail />} />
         <Route path="*" element={<NotFound />} />
       </Routes>
     </Router>
